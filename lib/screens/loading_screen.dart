@@ -1,6 +1,8 @@
+import 'package:clima/services/networking.dart';
 import 'package:flutter/material.dart';
 import '../services/location.dart';
-import 'package:http/http.dart' as http;
+
+const String apiKey = 'a1fcda43d56ae6c3d755de2a5f4f15d8';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({Key? key}) : super(key: key);
@@ -10,33 +12,27 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  void getLocation() async {
+  late double longitute;
+  late double latitute;
+  void getLocationData() async {
     Location myLocation = Location();
     await myLocation.getCurrentLocation();
-    // print(myLocation.longitute);
-    // print(myLocation.latitute);
-  }
+    latitute = myLocation.latitute;
+    longitute = myLocation.longitute;
+    NetworkHelper networkHelper = NetworkHelper(
+        'https://api.openweathermap.org/data/2.5/weather?lat=$latitute&lon=$longitute&appid=$apiKey');
 
-  void getData() async {
-    http.Response response =
-        await http.get(Uri.parse('https://anapioficeandfire.com/api/houses/1'));
-    if (response.statusCode == 200) {
-      // String data = response.body;
-      // print(data);
-    } else {
-      // print(response.statusCode);
-    }
+    var weatherData = await networkHelper.getData();
   }
 
   @override
   void initState() {
-    getLocation();
+    getLocationData();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    getData();
     return const Scaffold(
       body: Center(child: Text('Location')),
     );
